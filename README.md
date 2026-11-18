@@ -124,7 +124,23 @@ github:junyisunme/dsh-plugin-my-earth#<40 位 commit SHA>
 
 **第 3 步**，agent 会调用 `create_map`（参数就是上面的字段结构），拿回：
 
-<!-- VERIFIED-RESULT -->
+实测结果（2026-11-18，DSH `0.2.2-rc.3`，公开 API 预览域名）：
+
+| 字段 | 实测值 |
+| --- | --- |
+| `shareUrl` | [`?map=JeAy_0lLEciHT7Yf48GURBqj`](https://6afc8b581813239311ea1a4d--me-interest-globe.netlify.app/?map=JeAy_0lLEciHT7Yf48GURBqj) |
+| `previewImageUrl` | [`/api/covers/v2/JeAy_0lLEciHT7Yf48GURBqj.png`](https://6afc8b581813239311ea1a4d--me-interest-globe.netlify.app/api/covers/v2/JeAy_0lLEciHT7Yf48GURBqj.png) |
+| `coverStatus` | `ready`（封面 PNG 实测 `200 image/png`，74 KB） |
+| `mapId` | `JeAy_0lLEciHT7Yf48GURBqj` |
+| `eventCount` / `countryCount` / `cityCount` | `5` / `1` / `2` |
+
+工具在会话里直接渲染成：
+
+```text
+My Earth map: https://6afc8b581813239311ea1a4d--me-interest-globe.netlify.app/?map=JeAy_0lLEciHT7Yf48GURBqj
+Cover (1200×630 PNG): https://6afc8b581813239311ea1a4d--me-interest-globe.netlify.app/api/covers/v2/JeAy_0lLEciHT7Yf48GURBqj.png
+Contents: 5 events, 1 country, 2 places.
+```
 
 **第 4 步**，打开 `shareUrl` 就是交互地图；`previewImageUrl` 是同一张地图的 1200×630 封面图，
 可以直接贴到聊天、文档或社交媒体。封面返回 `failed` 时只把 `shareUrl` 发出去就行。
