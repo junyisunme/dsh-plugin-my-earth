@@ -1,0 +1,43 @@
+{
+  "name": "dsh-plugin-my-earth",
+  "version": "0.1.0",
+  "description": "把地点数据变成一张可分享的 My Earth 地图（公开测试版）。Create a shareable My Earth map, with a cover image, from place data.",
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "dsh",
+    "my-earth",
+    "map",
+    "地图"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "docs",
+    "icon.svg",
+    "examples",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/junyisunme/dsh-plugin-my-earth.git"
+  },
+  "homepage": "https://github.com/junyisunme/dsh-plugin-my-earth#readme",
+  "bugs": {
+    "url": "https://github.com/junyisunme/dsh-plugin-my-earth/issues"
+  }
+}
