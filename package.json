@@ -1,6 +1,6 @@
 {
   "name": "dsh-plugin-my-earth",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "把地点数据变成一张可分享的 My Earth 地图（公开测试版）。Create a shareable My Earth map, with a cover image, from place data.",
   "keywords": [
     "dsh-plugin",

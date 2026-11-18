@@ -1,6 +1,6 @@
 # My Earth 建图 · `dsh-plugin-my-earth`
 
-**公开测试版 `v0.1.0`** ｜ [English](#english) ｜ [完整示例](#完整例子把这五家日本古董吉他店做成一张地图)
+**公开测试版 `v0.1.1`** ｜ [English](#english) ｜ [完整示例](#完整例子把这五家日本古董吉他店做成一张地图并生成公开分享链接) ｜ [v0.1.1 变更](#v011-变更)
 
 把地点数据变成一张可分享的 My Earth 交互地图。跟 agent 说一句话，它调用 `create_map`，
 插件把标题和地点列表发到公开的 My Earth API，拿回**地图链接**和**1200×630 封面图链接**。
@@ -10,6 +10,17 @@
 - API 地址是可配置项，默认使用 `me-my-earth` 公开 [`docs/API.md`](https://github.com/junyisunme/me-my-earth/blob/main/docs/API.md) 里验证过的建图预览地址。
 - 安装包只依赖**公开 API**和**公开示例**：没有私有服务、没有私有依赖、没有构建脚本。
 
+## 草稿还是发布？
+
+`create_map` 只在用户明确要求发布时调用。**一次工具调用只会发出一次 `POST /api/maps`。**
+
+| 用户说 | Agent 应该做 | POST 次数 |
+| --- | --- | --- |
+| 「整理去年全家去过的地方」「先给我看看」「给我 JSON」 | 用文件能力写一份本地 JSON 草稿，把路径和内容交给用户 | **0** |
+| 「发布这份草稿」「生成公开分享链接」 | 调用 `create_map` 一次，返回地图链接和封面 | **1** |
+
+发布后的地图是**公开链接**：拿到链接的人都能打开，并查看每个地点的来源。不要替用户把草稿直接发布。
+
 ## 它做什么
 
 | 项 | 值 |
@@ -17,7 +28,7 @@
 | 工具名 | `create_map` |
 | 输入 | 符合公开 API 合约的地图数据：`title` + `events`（每个事件含 `source` 与 1–30 个 `locations`） |
 | 输出 | `shareUrl`、`previewImageUrl`、`coverStatus`，外加 `mapId`、`coverError` 和 `eventCount`/`countryCount`/`cityCount` |
-| 副作用 | 向配置里的公开 API 发一次 `POST /api/maps`；插件不在本地保存任何副本 |
+| 副作用 | 只在用户明确要求发布时，向配置里的公开 API 发一次 `POST /api/maps`；草稿不调用 |
 | 关闭插件后 | `create_map` 工具从会话里消失，已生成的地图不受影响 |
 
 ## 安装
@@ -29,22 +40,22 @@
 打开 **Plugins** → **Add plugin**，粘贴：
 
 ```
-github:junyisunme/dsh-plugin-my-earth#v0.1.0
+github:junyisunme/dsh-plugin-my-earth#v0.1.1
 ```
 
 ### 方式二：让 agent 安装
 
 ```
-用 plugin_manager 安装 github:junyisunme/dsh-plugin-my-earth#v0.1.0
+用 plugin_manager 安装 github:junyisunme/dsh-plugin-my-earth#v0.1.1
 ```
 
 ### 方式三：命令行
 
 ```sh
-dsh plugin --profile <profile> add github:junyisunme/dsh-plugin-my-earth#v0.1.0
+dsh plugin --profile <profile> add github:junyisunme/dsh-plugin-my-earth#v0.1.1
 ```
 
-`#v0.1.0` 是发布标签。要按不可变提交安装（推荐，避免后续 push 改变实际执行的代码），
+`#v0.1.1` 是发布标签。要按不可变提交安装（推荐，避免后续 push 改变实际执行的代码），
 把标签换成 Release 说明里给出的 40 位 commit SHA：
 
 ```
@@ -111,7 +122,7 @@ github:junyisunme/dsh-plugin-my-earth#<40 位 commit SHA>
 - `city`：用已知 `placeId`，或者给出城市区位的经纬度。
 - `point`：给精确的标记点，比如店面位置。点只是标记，不会画任何边界。
 
-## 完整例子：把这五家日本古董吉他店做成一张地图
+## 完整例子：把这五家日本古董吉他店做成一张地图，并生成公开分享链接
 
 示例数据就是仓库里的 [`examples/guitar-five.json`](examples/guitar-five.json)，
 与 `me-my-earth` 仓库的公开示例一致（东京 3 家 + 大阪 2 家）。
@@ -120,11 +131,13 @@ github:junyisunme/dsh-plugin-my-earth#<40 位 commit SHA>
 
 **第 2 步**，对 agent 说：
 
-> 把这五家日本古董吉他店做成一张地图
+> 把这五家日本古董吉他店做成一张地图，并生成公开分享链接
+
+这句话明确要求发布，所以 agent 会调用 `create_map` 一次。
 
 **第 3 步**，agent 会调用 `create_map`（参数就是上面的字段结构），拿回：
 
-实测结果（2026-11-18，DSH `0.2.2-rc.3`，公开 API 预览域名）：
+实测结果（v0.1.0，2026-11-18，DSH `0.2.2-rc.3`，公开 API 预览域名；v0.1.1 未改输出字段）：
 
 | 字段 | 实测值 |
 | --- | --- |
@@ -145,6 +158,22 @@ Contents: 5 events, 1 country, 2 places.
 **第 4 步**，打开 `shareUrl` 就是交互地图；`previewImageUrl` 是同一张地图的 1200×630 封面图，
 可以直接贴到聊天、文档或社交媒体。封面返回 `failed` 时只把 `shareUrl` 发出去就行。
 
+如果用户只想要草稿，说「先把这五家店整理成草稿」；agent 应该写本地 JSON，不调用 `create_map`。
+
+## 超时、断线或缺少 shareUrl
+
+工具把以下情况视为**创建结果未确认**：
+
+- 请求超时；
+- 连接中断；
+- API 返回成功（2xx）但响应没有 `shareUrl`。
+
+这时地图可能已经保存。工具会提示「创建结果未确认，地图可能已保存」，并且**不自动重发**。Agent 也不应该在同一个任务里再调用一次 `create_map`；先让用户确认结果，只有用户明确要求重试时才重新提交。
+
+已返回 `shareUrl` 但 `coverStatus` 为 `failed`：照常交付地图链接，这次创建仍然只发过 1 次 POST。
+
+服务端明确拒绝（如 400/429）时，错误里保留 API 的 `message` 和 `issues` 字段路径，方便用户修改数据。
+
 ## 返回字段
 
 | 字段 | 说明 |
@@ -160,6 +189,7 @@ Contents: 5 events, 1 country, 2 places.
 
 - **公开测试版**：默认 API 是公开预览域名，随时可能切换到正式域名；链接域名变化时用 `apiBaseUrl` 覆盖即可，不需要重装插件。
 - **地图是公开的**：生成的地图存在公开服务上，任何拿到链接的人都能打开。不要提交隐私信息、未公开地址或敏感数据。
+- **草稿不发布**：「整理」「生成草稿」「先给我看看」「给我 JSON」只写本地文件，不调用 `create_map`；只有明确要求发布时才发一次 POST。
 - 请求体上限 **512 KB**，最多 **100 个事件**，每个事件最多 **30 个地点**。
 - 公开 API 会拒绝未知国家 ID、重复事件 ID、未知或不匹配的 `placeId`、非法坐标和控制字符；这类错误会带着具体字段路径返回给 agent，方便它改完重试。
 - 封面生成是尽力而为：失败不影响地图本身。
@@ -171,29 +201,56 @@ Contents: 5 events, 1 country, 2 places.
 - 纯 ESM、零依赖、无 `prepare`/`build` 脚本，git 安装不需要 pnpm 的 build 授权。
 - 只用到 DSH 的公开扩展点：`ctx.tools.register()`（Host 侧工具注册）与 loader 补丁。
 
+## v0.1.1 变更
+
+- `create_map` 的说明明确草稿与发布边界：草稿由 Agent 用文件能力交付，**0 次 POST**；只有用户明确要求发布时才调用，**一次调用只发一次 POST**。
+- 请求超时、连接中断、2xx 响应缺少 `shareUrl` 时统一提示「创建结果未确认，地图可能已保存」，工具和 Agent 都不自动重发。
+- 已返回 `shareUrl` 但封面失败时仍交付地图链接；服务端明确拒绝时保留 `message` 和字段路径。
+- README、locale（zh/en）和详情文案同步；吉他示例改为「…并生成公开分享链接」。
+
+### v0.1.1 验收（2026-11-19）
+
+在 DSH `0.2.2-rc.3` 的真实 headless 会话里接计数 mock API：
+
+| 场景 | 结果 |
+| --- | --- |
+| 先给旅行草稿 | **0 次 POST**，写出本地 JSON |
+| 发布同一份草稿 | **1 次 POST** |
+| 成功 2xx 但缺少 `shareUrl` | 1 次 POST，返回「未确认」，不重发 |
+| 请求超时 | 1 次 POST，返回「未确认」，不重发 |
+| 封面失败的成功响应 | 1 次 POST，仍交付可用 `shareUrl` |
+| 400 / 429 | 工具层测试保留 API `message` 和字段路径，不重发 |
+
+mock 返回的链接是 `127.0.0.1`，只用于验收；真实公开链接由配置的 API 域名生成。
+
 ## English
 
-**My Earth map builder — public beta `v0.1.0`.**
+**My Earth map builder — public beta `v0.1.1`.**
 
-A DeepSeek Harness bundle that registers one tool, `create_map`. Give it place data
-(a map `title` plus `events` with `source` and 1–30 `locations`, matching the public
-My Earth map contract) and it posts that document to a configurable public My Earth API,
-returning a shareable `shareUrl`, a public 1200×630 `previewImageUrl`, and `coverStatus`.
-If the cover cannot be generated the map still exists, so the tool returns the working
-link with `coverStatus: "failed"` instead of failing.
+A DeepSeek Harness bundle that registers one tool, `create_map`. Call it only when the user
+explicitly asks to publish a draft or create a public share link. One call sends exactly one
+`POST /api/maps`. For an organize, draft, “show me first” or “give me JSON” request, the agent
+builds a local JSON draft with the file tools and does **not** POST. A published map is public
+by link: anyone with the URL can open it and follow its sources.
+
+If the request times out, the connection breaks, or a 2xx response has no `shareUrl`, the tool
+reports that the creation result is unconfirmed and the map may already be saved. It does not
+retry, and the agent must not POST again automatically. If a `shareUrl` is returned with
+`coverStatus: "failed"`, deliver the link. Server rejections keep the API message and field
+paths.
 
 Install from GitHub — **Plugins** → **Add plugin**:
 
 ```
-github:junyisunme/dsh-plugin-my-earth#v0.1.0
+github:junyisunme/dsh-plugin-my-earth#v0.1.1
 ```
 
-or `dsh plugin --profile <profile> add github:junyisunme/dsh-plugin-my-earth#v0.1.0`.
-Then start a new session and ask: *“Turn these five vintage guitar shops in Japan into a map.”*
-`examples/guitar-five.json` is the complete example input. Configuration: `apiBaseUrl`
-(defaults to the verified public preview base URL) and `timeoutMs` (45000).
-Maps are shared by link and are public; the plugin keeps no local copy, needs no account,
-and has no dependencies or build step. Requires DSH 0.2.2-rc.3 or newer (tested there).
+or `dsh plugin --profile <profile> add github:junyisunme/dsh-plugin-my-earth#v0.1.1`.
+Then start a new session and ask: *“Turn these five vintage guitar shops in Japan into a map
+and generate a public share link.”* `examples/guitar-five.json` is the complete example input.
+Configuration: `apiBaseUrl` (defaults to the verified public preview base URL) and `timeoutMs`
+(45000). The plugin keeps no local copy, needs no account, and has no dependencies or build
+step. Requires DSH 0.2.2-rc.3 or newer (tested there).
 
 ## 来源与许可
 

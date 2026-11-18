@@ -380,6 +380,19 @@ function withDeadline(signal, timeoutMs) {
 }
 
 /**
+ * Build the one model-facing message for a result that may or may not have
+ * reached the service. The model must not resend the POST on its own.
+ * @param reason - what made the result ambiguous.
+ * @returns an error whose message tells the model to stop and ask.
+ */
+function unconfirmedError(reason) {
+  return new Error(
+    `My Earth map creation is unconfirmed (${reason}); the map may already be saved. `
+    + 'Do not POST again automatically. Ask the user to check the result before retrying.',
+  )
+}
+
+/**
  * Create one map through the public API.
  * @param endpoint - absolute `.../api/maps` URL.
  * @param body - serialized document.
@@ -400,9 +413,9 @@ async function postMap(endpoint, body, signal, timeoutMs) {
   } catch (error) {
     if (signal !== null && typeof signal === 'object' && signal.aborted) throw error
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error(`My Earth API did not answer within ${timeoutMs} ms. The map was not confirmed; retry later.`)
+      throw unconfirmedError(`request timed out after ${timeoutMs} ms`)
     }
-    throw new Error(`My Earth API request failed: ${error instanceof Error ? error.message : String(error)}`)
+    throw unconfirmedError(`connection failed: ${error instanceof Error ? error.message : String(error)}`)
   } finally {
     deadline.dispose()
   }
@@ -418,10 +431,17 @@ function createMapTool(settings) {
   return {
     name: 'create_map',
     description:
-      'Create a shareable My Earth map from place data and return its public link plus a 1200×630 cover image. '
-      + 'Use it when the user asks to put places on a map, to see where places sit relative to each other, '
-      + 'or to share a map link. The data is posted to the configured public My Earth API and is not stored locally. '
-      + 'When the cover cannot be generated the map still exists, so the link is returned with coverStatus "failed".',
+      'Publish one My Earth map and return its public share link plus a 1200×630 cover image. '
+      + 'Call it only when the user explicitly asks to publish a draft or create a public share link. '
+      + 'For an organize, draft, "先给我看看" or "give me JSON" request, do not call this tool: '
+      + 'build a local JSON draft with the available file tools and do not POST. '
+      + 'One call sends exactly one POST to the configured public My Earth API. '
+      + 'The resulting map is public by link, so anyone with the URL can open it and follow its sources. '
+      + 'If the request times out, the connection breaks, or a success response has no shareUrl, '
+      + 'report that the creation result is unconfirmed and the map may already be saved; '
+      + 'do not POST again automatically. '
+      + 'If a shareUrl is returned but coverStatus is "failed", deliver the link; the cover is optional. '
+      + 'A server rejection returns the API error with its field paths.',
     parameters: PARAMETERS,
     output: {
       schema: OUTPUT_SCHEMA,
@@ -460,15 +480,16 @@ function createMapTool(settings) {
       } catch {
         payload = undefined
       }
-      if (!response.ok) throw new Error(describeApiFailure(response.status, payload, response.text))
+      if (!response.ok) {
+        const detail = describeApiFailure(response.status, payload, response.text)
+        throw response.status >= 500 ? unconfirmedError(detail) : new Error(detail)
+      }
       if (payload === null || typeof payload !== 'object' || Array.isArray(payload)) {
-        throw new Error(`My Earth API returned an unreadable response (HTTP ${response.status}). No map link was confirmed.`)
+        throw unconfirmedError(`HTTP ${response.status} response was not a readable map object`)
       }
       const shareUrl = stringOrNull(payload.shareUrl)
       if (shareUrl === null) {
-        throw new Error(
-          `My Earth API returned HTTP ${response.status} without a shareUrl, so no map can be shared. Retry later.`,
-        )
+        throw unconfirmedError(`HTTP ${response.status} response had no shareUrl`)
       }
       const previewImageUrl = stringOrNull(payload.previewImageUrl)
       return {

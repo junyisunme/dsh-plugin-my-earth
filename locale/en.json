@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "My Earth map builder",
-    "description": "Turn place data into a shareable My Earth interactive map. Ask the agent to put places on a map and it calls create_map with a map title and place list; the plugin posts that data to a configurable public My Earth API and returns the shareable map link, a 1200×630 cover image link, and the cover status. When the cover fails it still returns the map link instead of failing the call. The data goes only to that public API; the plugin keeps no copy, and turning the plugin off removes the create_map tool. Public beta: the default address is the public preview domain (a stable domain follows), maps are shared by link, and no account or API key is needed.",
+    "description": "Turn a place list, ranking or trip notebook into a shareable My Earth interactive map. Call create_map only when the user explicitly asks to publish a draft or create a public share link; one call sends exactly one POST. For organize, draft, show-me-first or give-me-JSON requests, the agent builds a local JSON draft with the file tools and does not upload it. A published map is public by link: anyone with the URL can open it and follow each place's sources. If the request times out, the connection breaks, or a success response has no shareUrl, the tool says the creation result is unconfirmed and the map may already be saved, and it does not retry; a shareUrl returned with a failed cover is still delivered. Server rejections keep the API message and field paths. The default API is the public preview domain; the plugin keeps no copy, and turning it off removes create_map.",
     "detail": "docs/DETAIL.md"
   }
 }

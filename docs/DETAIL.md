@@ -1,1 +1,1 @@
-![Five Japanese guitar shops as pins on a shareable map card, beside the generated cover image card](preview.svg)
+![Five Japanese guitar shops on a published shareable map card, beside the generated cover image card](preview.svg)
