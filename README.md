@@ -1,6 +1,6 @@
 # My Earth 建图 · `dsh-plugin-my-earth`
 
-**公开测试版 `v0.1.1`** ｜ [English](#english) ｜ [完整示例](#完整例子把这五家日本古董吉他店做成一张地图并生成公开分享链接) ｜ [v0.1.1 变更](#v011-变更)
+**公开测试版 `v0.1.2`** ｜ [English](#english) ｜ [完整示例](#完整例子把这五家日本古董吉他店做成一张地图并生成公开分享链接) ｜ [v0.1.2 变更](#v012-变更)
 
 把地点数据变成一张可分享的 My Earth 交互地图。跟 agent 说一句话，它调用 `create_map`，
 插件把标题和地点列表发到公开的 My Earth API，拿回**地图链接**和**1200×630 封面图链接**。
@@ -40,22 +40,22 @@
 打开 **Plugins** → **Add plugin**，粘贴：
 
 ```
-github:junyisunme/dsh-plugin-my-earth#v0.1.1
+github:junyisunme/dsh-plugin-my-earth#v0.1.2
 ```
 
 ### 方式二：让 agent 安装
 
 ```
-用 plugin_manager 安装 github:junyisunme/dsh-plugin-my-earth#v0.1.1
+用 plugin_manager 安装 github:junyisunme/dsh-plugin-my-earth#v0.1.2
 ```
 
 ### 方式三：命令行
 
 ```sh
-dsh plugin --profile <profile> add github:junyisunme/dsh-plugin-my-earth#v0.1.1
+dsh plugin --profile <profile> add github:junyisunme/dsh-plugin-my-earth#v0.1.2
 ```
 
-`#v0.1.1` 是发布标签。要按不可变提交安装（推荐，避免后续 push 改变实际执行的代码），
+`#v0.1.2` 是发布标签。要按不可变提交安装（推荐，避免后续 push 改变实际执行的代码），
 把标签换成 Release 说明里给出的 40 位 commit SHA：
 
 ```
@@ -71,7 +71,7 @@ github:junyisunme/dsh-plugin-my-earth#<40 位 commit SHA>
 
 | 配置项 | 默认值 | 说明 |
 | --- | --- | --- |
-| `apiBaseUrl` | `https://6afc8b581813239311ea1a4d--me-interest-globe.netlify.app` | 公开建图 API 的基地址（`POST <apiBaseUrl>/api/maps`）。公开测试版用的是预览域名，正式域名可在此切换。 |
+| `apiBaseUrl` | `https://me-interest-globe.netlify.app` | 公开建图 API 的基地址（`POST <apiBaseUrl>/api/maps`）。默认是正式域名；自定义地址会覆盖默认值。 |
 | `timeoutMs` | `45000` | 单次建图请求（含封面生成）的超时毫秒数。 |
 
 在自己的 profile `cordis.patch.yml` 里覆盖。注意 DSH 的补丁**整段替换**一行的 `config`，
@@ -137,12 +137,12 @@ github:junyisunme/dsh-plugin-my-earth#<40 位 commit SHA>
 
 **第 3 步**，agent 会调用 `create_map`（参数就是上面的字段结构），拿回：
 
-实测结果（v0.1.0，2026-11-18，DSH `0.2.2-rc.3`，公开 API 预览域名；v0.1.1 未改输出字段）：
+实测结果（v0.1.0，2026-11-18，DSH `0.2.2-rc.3`，公开 API 预览域名；v0.1.1 未改输出字段，v0.1.2 只切正式域名）：
 
 | 字段 | 实测值 |
 | --- | --- |
-| `shareUrl` | [`?map=JeAy_0lLEciHT7Yf48GURBqj`](https://6afc8b581813239311ea1a4d--me-interest-globe.netlify.app/?map=JeAy_0lLEciHT7Yf48GURBqj) |
-| `previewImageUrl` | [`/api/covers/v2/JeAy_0lLEciHT7Yf48GURBqj.png`](https://6afc8b581813239311ea1a4d--me-interest-globe.netlify.app/api/covers/v2/JeAy_0lLEciHT7Yf48GURBqj.png) |
+| `shareUrl` | [`?map=JeAy_0lLEciHT7Yf48GURBqj`](https://me-interest-globe.netlify.app/?map=JeAy_0lLEciHT7Yf48GURBqj) |
+| `previewImageUrl` | [`/api/covers/v2/JeAy_0lLEciHT7Yf48GURBqj.png`](https://me-interest-globe.netlify.app/api/covers/v2/JeAy_0lLEciHT7Yf48GURBqj.png) |
 | `coverStatus` | `ready`（封面 PNG 实测 `200 image/png`，74 KB） |
 | `mapId` | `JeAy_0lLEciHT7Yf48GURBqj` |
 | `eventCount` / `countryCount` / `cityCount` | `5` / `1` / `2` |
@@ -150,8 +150,8 @@ github:junyisunme/dsh-plugin-my-earth#<40 位 commit SHA>
 工具在会话里直接渲染成：
 
 ```text
-My Earth map: https://6afc8b581813239311ea1a4d--me-interest-globe.netlify.app/?map=JeAy_0lLEciHT7Yf48GURBqj
-Cover (1200×630 PNG): https://6afc8b581813239311ea1a4d--me-interest-globe.netlify.app/api/covers/v2/JeAy_0lLEciHT7Yf48GURBqj.png
+My Earth map: https://me-interest-globe.netlify.app/?map=JeAy_0lLEciHT7Yf48GURBqj
+Cover (1200×630 PNG): https://me-interest-globe.netlify.app/api/covers/v2/JeAy_0lLEciHT7Yf48GURBqj.png
 Contents: 5 events, 1 country, 2 places.
 ```
 
@@ -187,7 +187,7 @@ Contents: 5 events, 1 country, 2 places.
 
 ## 限制与边界
 
-- **公开测试版**：默认 API 是公开预览域名，随时可能切换到正式域名；链接域名变化时用 `apiBaseUrl` 覆盖即可，不需要重装插件。
+- **默认 API 是正式域名**：`https://me-interest-globe.netlify.app`。仍可用 `apiBaseUrl` 覆盖为自建或预览地址，不需要重装插件。
 - **地图是公开的**：生成的地图存在公开服务上，任何拿到链接的人都能打开。不要提交隐私信息、未公开地址或敏感数据。
 - **草稿不发布**：「整理」「生成草稿」「先给我看看」「给我 JSON」只写本地文件，不调用 `create_map`；只有明确要求发布时才发一次 POST。
 - 请求体上限 **512 KB**，最多 **100 个事件**，每个事件最多 **30 个地点**。
@@ -200,6 +200,12 @@ Contents: 5 events, 1 country, 2 places.
 - 实测环境：DeepSeek Harness `0.2.2-rc.3`。
 - 纯 ESM、零依赖、无 `prepare`/`build` 脚本，git 安装不需要 pnpm 的 build 授权。
 - 只用到 DSH 的公开扩展点：`ctx.tools.register()`（Host 侧工具注册）与 loader 补丁。
+
+## v0.1.2 变更
+
+- 默认 `apiBaseUrl` 从旧 QS 预览域名切到正式站 `https://me-interest-globe.netlify.app`。
+- `cordis.patch.yml`、README 配置表和示例链接同步到正式站；用户仍可在 profile 里用 `apiBaseUrl` 覆盖。
+- 没有改变 `create_map` 的输入/输出、草稿与发布边界或封面失败语义。
 
 ## v0.1.1 变更
 
@@ -225,7 +231,7 @@ mock 返回的链接是 `127.0.0.1`，只用于验收；真实公开链接由配
 
 ## English
 
-**My Earth map builder — public beta `v0.1.1`.**
+**My Earth map builder — public beta `v0.1.2`.**
 
 A DeepSeek Harness bundle that registers one tool, `create_map`. Call it only when the user
 explicitly asks to publish a draft or create a public share link. One call sends exactly one
@@ -242,13 +248,13 @@ paths.
 Install from GitHub — **Plugins** → **Add plugin**:
 
 ```
-github:junyisunme/dsh-plugin-my-earth#v0.1.1
+github:junyisunme/dsh-plugin-my-earth#v0.1.2
 ```
 
-or `dsh plugin --profile <profile> add github:junyisunme/dsh-plugin-my-earth#v0.1.1`.
+or `dsh plugin --profile <profile> add github:junyisunme/dsh-plugin-my-earth#v0.1.2`.
 Then start a new session and ask: *“Turn these five vintage guitar shops in Japan into a map
 and generate a public share link.”* `examples/guitar-five.json` is the complete example input.
-Configuration: `apiBaseUrl` (defaults to the verified public preview base URL) and `timeoutMs`
+Configuration: `apiBaseUrl` (defaults to `https://me-interest-globe.netlify.app`) and `timeoutMs`
 (45000). The plugin keeps no local copy, needs no account, and has no dependencies or build
 step. Requires DSH 0.2.2-rc.3 or newer (tested there).
 

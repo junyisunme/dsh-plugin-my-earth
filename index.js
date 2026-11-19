@@ -7,10 +7,10 @@
  * public service, the returned `shareUrl` is the deliverable, and the returned
  * `previewImageUrl` is a public 1200×630 PNG cover.
  *
- * Public beta: the configured default is a Deploy Preview of the public site.
- * When the cover cannot be generated the API still creates the map, so this tool
- * reports `coverStatus: "failed"` together with the working link instead of
- * failing the call.
+ * The configured default is the production public site. A caller can still override
+ * `apiBaseUrl` for a self-hosted or preview deployment. When the cover cannot be
+ * generated the API still creates the map, so this tool reports
+ * `coverStatus: "failed"` together with the working link instead of failing the call.
  */
 
 /** Loader row name for this bundle's patch entry. */
@@ -19,8 +19,8 @@ export const name = 'my-earth'
 /** The tool registry is the only service this bundle needs. */
 export const inject = ['tools']
 
-/** Verified public preview base URL; see docs/API.md in the me-my-earth repository. */
-const DEFAULT_API_BASE_URL = 'https://6afc8b581813239311ea1a4d--me-interest-globe.netlify.app'
+/** Verified public production base URL; see docs/API.md in the me-my-earth repository. */
+const DEFAULT_API_BASE_URL = 'https://me-interest-globe.netlify.app'
 
 /** Upper bound on one request, covering upload and cover generation. */
 const DEFAULT_TIMEOUT_MS = 45_000

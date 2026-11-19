@@ -1,10 +1,10 @@
 # My Earth bundle layer: inserts the create_map tool row.
-# The value below is the verified public preview base URL from
+# The value below is the production public base URL from
 # https://github.com/junyisunme/me-my-earth/blob/main/docs/API.md.
 # Override `apiBaseUrl` in your own profile patch to switch domains.
 - insert:
     - id: my-earth
       name: 'dsh-plugin-my-earth'
       config:
-        apiBaseUrl: https://6afc8b581813239311ea1a4d--me-interest-globe.netlify.app
+        apiBaseUrl: https://me-interest-globe.netlify.app
         timeoutMs: 45000
